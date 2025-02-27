@@ -71,7 +71,7 @@ var _ = Describe("Recovery", func() {
 					"key":     "${schema.spec.configKey}",
 					"version": "initial",
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 		)
 
 		// Create ResourceGraphDefinition

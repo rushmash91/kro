@@ -71,7 +71,7 @@ var _ = Describe("Topology", func() {
 						"arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
 					},
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 			// VPC - no dependencies
 			generator.WithResource("vpc", map[string]interface{}{
 				"apiVersion": "ec2.services.k8s.aws/v1alpha1",
@@ -86,7 +86,7 @@ var _ = Describe("Topology", func() {
 					"enableDNSHostnames": true,
 					"enableDNSSupport":   true,
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 			// Subnet A - depends on VPC
 			generator.WithResource("subnetA", map[string]interface{}{
 				"apiVersion": "ec2.services.k8s.aws/v1alpha1",
@@ -99,7 +99,7 @@ var _ = Describe("Topology", func() {
 					"cidrBlock":        "192.168.0.0/18",
 					"vpcID":            "${vpc.status.vpcID}",
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 			// Subnet B - depends on VPC
 			generator.WithResource("subnetB", map[string]interface{}{
 				"apiVersion": "ec2.services.k8s.aws/v1alpha1",
@@ -112,7 +112,7 @@ var _ = Describe("Topology", func() {
 					"cidrBlock":        "192.168.64.0/18",
 					"vpcID":            "${vpc.status.vpcID}",
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 			// Cluster - depends on VPC, Subnets, and IAM Role
 			generator.WithResource("cluster", map[string]interface{}{
 				"apiVersion": "eks.services.k8s.aws/v1alpha1",
@@ -133,7 +133,7 @@ var _ = Describe("Topology", func() {
 						"endpointPublicAccess":  true,
 					},
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 		)
 
 		Expect(env.Client.Create(ctx, rgd)).To(Succeed())
@@ -189,7 +189,7 @@ var _ = Describe("Topology", func() {
 						"192.168.0.0/16",
 					},
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 			generator.WithResource("subnet", map[string]interface{}{
 				"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 				"kind":       "Subnet",
@@ -200,7 +200,7 @@ var _ = Describe("Topology", func() {
 					"vpcID":     "${vpc.status.vpcID}", // Creating cyclic dependency
 					"cidrBlock": "192.168.1.0/24",
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 		)
 
 		Expect(env.Client.Create(ctx, rgd)).To(Succeed())

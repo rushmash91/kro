@@ -40,8 +40,8 @@ func deploymentService(
 				"availableReplicas":    "${deployment.status.availableReplicas}",
 			},
 		),
-		generator.WithResource("deployment", deploymentDef(), nil, nil),
-		generator.WithResource("service", serviceDef(), nil, nil),
+		generator.WithResource("deployment", deploymentDef(), nil, nil, nil),
+		generator.WithResource("service", serviceDef(), nil, nil, nil),
 	)
 	instanceGenerator := func(namespace, name string, port int) *unstructured.Unstructured {
 		return &unstructured.Unstructured{

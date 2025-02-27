@@ -68,7 +68,7 @@ var _ = Describe("CRD", func() {
 						"key":  "value",
 						"key2": "${schema.spec.field2}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			)
 
 			Expect(env.Client.Create(ctx, rgd)).To(Succeed())

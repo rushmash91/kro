@@ -56,9 +56,9 @@ var _ = Describe("Validation", func() {
 					nil,
 				),
 				// Valid lower camelCase names
-				generator.WithResource("myResource", validResourceDef(), nil, nil),
-				generator.WithResource("anotherResource", validResourceDef(), nil, nil),
-				generator.WithResource("testResource", validResourceDef(), nil, nil),
+				generator.WithResource("myResource", validResourceDef(), nil, nil, nil),
+				generator.WithResource("anotherResource", validResourceDef(), nil, nil, nil),
+				generator.WithResource("testResource", validResourceDef(), nil, nil, nil),
 			)
 
 			Expect(env.Client.Create(ctx, rgd)).To(Succeed())
@@ -95,7 +95,7 @@ var _ = Describe("Validation", func() {
 						},
 						nil,
 					),
-					generator.WithResource(invalidName, validResourceDef(), nil, nil),
+					generator.WithResource(invalidName, validResourceDef(), nil, nil, nil),
 				)
 
 				Expect(env.Client.Create(ctx, rgd)).To(Succeed())
@@ -131,8 +131,8 @@ var _ = Describe("Validation", func() {
 					},
 					nil,
 				),
-				generator.WithResource("myResource", validResourceDef(), nil, nil),
-				generator.WithResource("myResource", validResourceDef(), nil, nil), // Duplicate
+				generator.WithResource("myResource", validResourceDef(), nil, nil, nil),
+				generator.WithResource("myResource", validResourceDef(), nil, nil, nil), // Duplicate
 			)
 
 			Expect(env.Client.Create(ctx, rgd)).To(Succeed())
@@ -175,7 +175,7 @@ var _ = Describe("Validation", func() {
 					"metadata": map[string]interface{}{
 						"name": "test-config",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			)
 
 			Expect(env.Client.Create(ctx, rgd)).To(Succeed())
@@ -229,7 +229,7 @@ var _ = Describe("Validation", func() {
 						},
 						nil,
 					),
-					generator.WithResource("resource", invalidObj, nil, nil),
+					generator.WithResource("resource", invalidObj, nil, nil, nil),
 				)
 
 				Expect(env.Client.Create(ctx, rgd)).To(Succeed())
@@ -327,7 +327,7 @@ var _ = Describe("Validation", func() {
 					"metadata": map[string]interface{}{
 						"name": "${Bad expression}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			)
 
 			Expect(env.Client.Create(ctx, rgd)).To(Succeed())

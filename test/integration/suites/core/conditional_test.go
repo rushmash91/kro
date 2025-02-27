@@ -100,7 +100,7 @@ var _ = Describe("Conditions", func() {
 						},
 					},
 				},
-			}, nil, []string{"${schema.spec.deploymentAenabled}"}),
+			}, nil, []string{"${schema.spec.deploymentAenabled}"}, []string{}),
 			// Depends on serviceAccountA
 			generator.WithResource("deploymentB", map[string]interface{}{
 				"apiVersion": "apps/v1",
@@ -137,7 +137,7 @@ var _ = Describe("Conditions", func() {
 						},
 					},
 				},
-			}, nil, []string{"${schema.spec.deploymentBenabled}"}),
+			}, nil, []string{"${schema.spec.deploymentBenabled}"}, []string{}),
 			// serviceAccountA - no dependencies
 			generator.WithResource("serviceAccountA", map[string]interface{}{
 				"apiVersion": "v1",
@@ -145,7 +145,7 @@ var _ = Describe("Conditions", func() {
 				"metadata": map[string]interface{}{
 					"name": "${schema.spec.name}-a",
 				},
-			}, nil, []string{"${schema.spec.serviceAccountAenabled}"}),
+			}, nil, []string{"${schema.spec.serviceAccountAenabled}"}, []string{}),
 			// ServiceAccount - depends on service
 			generator.WithResource("serviceAccountB", map[string]interface{}{
 				"apiVersion": "v1",
@@ -153,7 +153,7 @@ var _ = Describe("Conditions", func() {
 				"metadata": map[string]interface{}{
 					"name": "${serviceA.metadata.name}",
 				},
-			}, nil, []string{"${schema.spec.serviceAccountBenabled}"}),
+			}, nil, []string{"${schema.spec.serviceAccountBenabled}"}, []string{}),
 			// ServiceA - depends on DeploymentA
 			generator.WithResource("serviceA", map[string]interface{}{
 				"apiVersion": "v1",
@@ -172,7 +172,7 @@ var _ = Describe("Conditions", func() {
 						},
 					},
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 			// ServiceB - depends on deploymentA and deploymentB
 			generator.WithResource("serviceB", map[string]interface{}{
 				"apiVersion": "v1",
@@ -191,7 +191,7 @@ var _ = Describe("Conditions", func() {
 						},
 					},
 				},
-			}, nil, []string{"${schema.spec.serviceBenabled}"}),
+			}, nil, []string{"${schema.spec.serviceBenabled}"}, []string{}),
 		)
 
 		// Create ResourceGraphDefinition

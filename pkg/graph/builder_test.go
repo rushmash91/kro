@@ -56,7 +56,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"metadata": map[string]interface{}{
 						"name": "test-vpc",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "schema not found",
@@ -77,7 +77,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"metadata": map[string]interface{}{
 						"name": "test-vpc",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "naming convention violation",
@@ -94,7 +94,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 				),
 				generator.WithResource("vpc", map[string]interface{}{ // Invalid name with operator
 					"vvvvv": "ec2.services.k8s.aws/v1alpha1",
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "is not a valid Kubernetes object",
@@ -115,7 +115,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"metadata": map[string]interface{}{
 						"name": "test-vpc",
 					},
-				}, []string{"invalid ! syntax"}, nil),
+				}, []string{"invalid ! syntax"}, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "failed to parse readyWhen expressions",
@@ -136,7 +136,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"metadata": map[string]interface{}{
 						"name": "test-vpc",
 					},
-				}, nil, []string{"invalid ! syntax"}),
+				}, nil, []string{"invalid ! syntax"}, nil),
 			},
 			wantErr: true,
 			errMsg:  "failed to parse includeWhen expressions",
@@ -158,7 +158,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"cidrBlocks": []interface{}{"10.0.0.0/16"},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "metadata field not found",
@@ -182,7 +182,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"vpcID": "${vpc.status.nonexistentField}", // Invalid field
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "failed to validate resource CEL expression",
@@ -209,7 +209,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 						"enableDNSSupport":   true,
 						"enableDNSHostnames": true,
 					},
-				}, []string{"${vpc.status.state == 'available'}"}, nil),
+				}, []string{"${vpc.status.state == 'available'}"}, nil, nil),
 				generator.WithResource("subnet1", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -220,7 +220,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 						"cidrBlock": "10.0.1.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, []string{"${subnet1.status.state == 'available'}"}, []string{"${schema.spec.enableSubnets == true}"}),
+				}, []string{"${subnet1.status.state == 'available'}"}, []string{"${schema.spec.enableSubnets == true}"}, nil),
 				generator.WithResource("subnet2", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -231,7 +231,8 @@ func TestGraphBuilder_Validation(t *testing.T) {
 						"cidrBlock": "10.0.127.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, []string{"${subnet2.status.state == 'available'}"}, []string{"${schema.spec.enableSubnets}"})},
+				}, []string{"${subnet2.status.state == 'available'}"}, []string{"${schema.spec.enableSubnets}"}, nil),
+			},
 			wantErr: false,
 		},
 		{
@@ -250,7 +251,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"metadata": map[string]interface{}{
 						"name": "test-vpc",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "schema not found",
@@ -287,7 +288,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"metadata": map[string]interface{}{
 						"name": "test-vpc",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "undeclared reference to 'nonexistent'",
@@ -311,7 +312,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"cidrBlocks": "10.0.0.0/16", // should be array
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "expected string type or AdditionalProperties for path spec.cidrBlocks",
@@ -343,7 +344,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 						},
 						"scope": "Namespaced-${schema.spec.name}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "CEL expressions are not supported for CRDs",
@@ -373,7 +374,7 @@ func TestGraphBuilder_Validation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"cidrBlocks": []interface{}{"10.0.0.0/16"},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: false,
 		},
@@ -429,7 +430,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"cidrBlocks": []interface{}{"10.0.0.0/16"},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("clusterpolicy", map[string]interface{}{
 					"apiVersion": "iam.services.k8s.aws/v1alpha1",
 					"kind":       "Policy",
@@ -440,7 +441,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"name":     "testclusterpolicy",
 						"document": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				// Second layer: Resources depending on first layer
 				generator.WithResource("clusterrole", map[string]interface{}{
 					"apiVersion": "iam.services.k8s.aws/v1alpha1",
@@ -452,7 +453,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"name":                     "${clusterpolicy.status.policyID}role",
 						"assumeRolePolicyDocument": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("subnet1", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -463,7 +464,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"cidrBlock": "10.0.1.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("subnet2", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -474,7 +475,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"cidrBlock": "10.0.2.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				// Third layer: EKS Cluster depending on roles and subnets
 				generator.WithResource("cluster", map[string]interface{}{
 					"apiVersion": "eks.services.k8s.aws/v1alpha1",
@@ -492,7 +493,8 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil)},
+				}, nil, nil, nil),
+			},
 			validateDeps: func(t *testing.T, g *Graph) {
 				// Validate dependencies
 				assert.Empty(t, g.Resources["vpc"].GetDependencies())
@@ -532,7 +534,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"cidrBlock": "10.0.0.0/24",
 						"vpcID":     "${missingvpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "undeclared reference to 'missingvpc'",
@@ -557,7 +559,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"name":                     "testrole1",
 						"assumeRolePolicyDocument": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("role2", map[string]interface{}{
 					"apiVersion": "iam.services.k8s.aws/v1alpha1",
 					"kind":       "Role",
@@ -568,7 +570,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"name":                     "testrole2",
 						"assumeRolePolicyDocument": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "graph contains a cycle",
@@ -597,7 +599,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("pod2", map[string]interface{}{
 					"apiVersion": "v1",
 					"kind":       "Pod",
@@ -612,7 +614,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("pod3", map[string]interface{}{
 					"apiVersion": "v1",
 					"kind":       "Pod",
@@ -627,7 +629,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("pod4", map[string]interface{}{
 					"apiVersion": "v1",
 					"kind":       "Pod",
@@ -642,7 +644,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			validateDeps: func(t *testing.T, g *Graph) {
 				assert.Len(t, g.Resources, 4)
@@ -678,7 +680,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("pod2", map[string]interface{}{
 					"apiVersion": "v1",
 					"kind":       "Pod",
@@ -693,7 +695,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("pod3", map[string]interface{}{
 					"apiVersion": "v1",
 					"kind":       "Pod",
@@ -708,7 +710,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("pod4", map[string]interface{}{
 					"apiVersion": "v1",
 					"kind":       "Pod",
@@ -723,7 +725,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			wantErr: true,
 			errMsg:  "graph contains a cycle",
@@ -748,7 +750,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"cidrBlocks": []interface{}{"10.0.0.0/16"},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("subnet1", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -759,7 +761,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"cidrBlock": "10.0.1.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("subnet2", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -770,7 +772,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"cidrBlock": "10.0.2.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("subnet3", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "Subnet",
@@ -781,7 +783,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"cidrBlock": "10.0.3.0/24",
 						"vpcID":     "${vpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("secgroup", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
 					"kind":       "SecurityGroup",
@@ -791,7 +793,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"vpcID": "${vpc.status.vpcID}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("policy", map[string]interface{}{
 					"apiVersion": "iam.services.k8s.aws/v1alpha1",
 					"kind":       "Policy",
@@ -801,7 +803,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 					"spec": map[string]interface{}{
 						"document": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("role", map[string]interface{}{
 					"apiVersion": "iam.services.k8s.aws/v1alpha1",
 					"kind":       "Role",
@@ -812,7 +814,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 						"name":                     "${policy.status.policyID}role",
 						"assumeRolePolicyDocument": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				// Three clusters using the same infrastructure
 				generator.WithResource("cluster1", map[string]interface{}{
 					"apiVersion": "eks.services.k8s.aws/v1alpha1",
@@ -830,7 +832,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("cluster2", map[string]interface{}{
 					"apiVersion": "eks.services.k8s.aws/v1alpha1",
 					"kind":       "Cluster",
@@ -847,7 +849,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				generator.WithResource("cluster3", map[string]interface{}{
 					"apiVersion": "eks.services.k8s.aws/v1alpha1",
 					"kind":       "Cluster",
@@ -864,7 +866,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				// Pod depending on all clusters
 				generator.WithResource("monitor", map[string]interface{}{
 					"apiVersion": "v1",
@@ -894,7 +896,7 @@ func TestGraphBuilder_DependencyValidation(t *testing.T) {
 							},
 						},
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 			},
 			validateDeps: func(t *testing.T, g *Graph) {
 				// Base infrastructure dependencies
@@ -989,7 +991,7 @@ func TestGraphBuilder_ExpressionParsing(t *testing.T) {
 					"spec": map[string]interface{}{
 						"document": "{}",
 					},
-				}, nil, nil),
+				}, nil, nil, nil),
 				// Resource with only readyWhen expressions
 				generator.WithResource("vpc", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
@@ -1003,7 +1005,7 @@ func TestGraphBuilder_ExpressionParsing(t *testing.T) {
 				}, []string{
 					"${vpc.status.state == 'available'}",
 					"${vpc.status.vpcID != ''}",
-				}, nil),
+				}, nil, nil),
 				// Resource with mix of static and dynamic expressions
 				generator.WithResource("subnet", map[string]interface{}{
 					"apiVersion": "ec2.services.k8s.aws/v1alpha1",
@@ -1021,7 +1023,7 @@ func TestGraphBuilder_ExpressionParsing(t *testing.T) {
 							},
 						},
 					},
-				}, []string{"${subnet.status.state == 'available'}"}, nil),
+				}, []string{"${subnet.status.state == 'available'}"}, nil, nil),
 				// Non-standalone expressions
 				generator.WithResource("cluster", map[string]interface{}{
 					"apiVersion": "eks.services.k8s.aws/v1alpha1",
@@ -1041,7 +1043,7 @@ func TestGraphBuilder_ExpressionParsing(t *testing.T) {
 					"${cluster.status.status == 'ACTIVE'}",
 				}, []string{
 					"${schema.spec.createMonitoring}",
-				}),
+				}, nil),
 				// All the above combined
 				generator.WithResource("monitor", map[string]interface{}{
 					"apiVersion": "v1",
@@ -1078,7 +1080,7 @@ func TestGraphBuilder_ExpressionParsing(t *testing.T) {
 					"${monitor.status.phase == 'Running'}",
 				}, []string{
 					"${schema.spec.createMonitoring == true}",
-				}),
+				}, nil),
 			},
 			validateVars: func(t *testing.T, g *Graph) {
 				// Verify resource with no expressions
@@ -1225,4 +1227,165 @@ func TestNewBuilder(t *testing.T) {
 	builder, err := NewBuilder(&rest.Config{})
 	assert.Nil(t, err)
 	assert.NotNil(t, builder)
+}
+
+func TestBuilder_buildDependencyGraph_ImplicitAndExplicitDependencies(t *testing.T) {
+	tests := []struct {
+		name      string
+		resources map[string]*Resource
+		// wantDeps specifies the expected merged dependencies for each resource.
+		wantDeps map[string][]string
+		wantErr  bool
+		errMsg   string
+	}{
+		{
+			name: "explicit only dependency",
+			resources: map[string]*Resource{
+				"res1": {
+					id:                   "res1",
+					explicitDependencies: []string{"res2"},
+					order:                1,
+				},
+				"res2": {
+					id:    "res2",
+					order: 2,
+				},
+			},
+			wantDeps: map[string][]string{
+				"res1": {"res2"},
+				"res2": {},
+			},
+			wantErr: false,
+		},
+		{
+			name: "implicit only dependency",
+			resources: map[string]*Resource{
+				"res1": {
+					id: "res1",
+					// Simulate an implicit dependency via a CEL expression that references "res2"
+					variables: []*variable.ResourceField{
+						{
+							FieldDescriptor: variable.FieldDescriptor{
+								Path:        "spec.field",
+								Expressions: []string{"res2.field"},
+							},
+							Kind: variable.ResourceVariableKindStatic,
+						},
+					},
+					order: 1,
+				},
+				"res2": {
+					id:    "res2",
+					order: 2,
+				},
+			},
+			wantDeps: map[string][]string{
+				"res1": {"res2"},
+				"res2": {},
+			},
+			wantErr: false,
+		},
+		{
+			name: "mixed explicit and implicit dependencies",
+			resources: map[string]*Resource{
+				"res1": {
+					id:                   "res1",
+					explicitDependencies: []string{"res3"},
+					variables: []*variable.ResourceField{
+						{
+							FieldDescriptor: variable.FieldDescriptor{
+								Path:        "spec.field",
+								Expressions: []string{"res2.field"},
+							},
+							Kind: variable.ResourceVariableKindStatic,
+						},
+					},
+					order: 1,
+				},
+				"res2": {
+					id:    "res2",
+					order: 2,
+				},
+				"res3": {
+					id:    "res3",
+					order: 3,
+				},
+			},
+			// The merged dependencies should include both the implicit dependency "res2"
+			// and the explicit dependency "res3". The order is not critical.
+			wantDeps: map[string][]string{
+				"res1": {"res2", "res3"},
+				"res2": {},
+				"res3": {},
+			},
+			wantErr: false,
+		},
+		{
+			name: "explicit dependency on non-existent resource",
+			resources: map[string]*Resource{
+				"res1": {
+					id:                   "res1",
+					explicitDependencies: []string{"nonexistent"},
+					order:                1,
+				},
+			},
+			wantErr: true,
+			errMsg:  "resource res1 has explicit dependency on non-existent resource nonexistent",
+		},
+		{
+			name: "circular explicit dependencies",
+			resources: map[string]*Resource{
+				"res1": {
+					id:                   "res1",
+					explicitDependencies: []string{"res2"},
+					order:                1,
+				},
+				"res2": {
+					id:                   "res2",
+					explicitDependencies: []string{"res1"},
+					order:                2,
+				},
+			},
+			wantErr: true,
+			errMsg:  "graph contains a cycle",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a Builder instance. For testing purposes, we assume that any
+			// dependencies on the CEL environment succeed.
+			b := &Builder{}
+
+			dag, err := b.buildDependencyGraph(tt.resources)
+			if tt.wantErr {
+				assert.Error(t, err)
+				if err != nil {
+					assert.Contains(t, err.Error(), tt.errMsg)
+				}
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.NotNil(t, dag)
+
+			// Verify that for each resource, every expected dependency is present
+			// in the corresponding DAG vertex.
+			for id, res := range tt.resources {
+				expectedDeps := tt.wantDeps[id]
+				vertex, ok := dag.Vertices[id]
+				assert.True(t, ok, "vertex for resource %s should exist in the DAG", id)
+				// The resource's merged dependencies (from GetDependencies)
+				actualDeps := res.GetDependencies()
+
+				// Check that every expected dependency is present in the DAG.
+				for _, dep := range expectedDeps {
+					assert.Contains(t, vertex.DependsOn, dep, "resource %s should depend on %s", id, dep)
+					assert.Contains(t, actualDeps, dep, "GetDependencies() for resource %s should include %s", id, dep)
+				}
+				// Also check that the count matches (order may not be significant)
+				assert.Equal(t, len(expectedDeps), len(vertex.DependsOn), "dependency count mismatch for resource %s", id)
+			}
+		})
+	}
 }

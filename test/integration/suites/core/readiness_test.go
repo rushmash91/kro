@@ -111,7 +111,7 @@ var _ = Describe("Readiness", func() {
 						},
 					},
 				},
-			}, []string{"${deployment.spec.replicas == deployment.status.availableReplicas}"}, nil),
+			}, []string{"${deployment.spec.replicas == deployment.status.availableReplicas}"}, nil, nil),
 			// ServiceB - depends on deploymentA and deploymentB
 			generator.WithResource("service", map[string]interface{}{
 				"apiVersion": "v1",
@@ -132,7 +132,7 @@ var _ = Describe("Readiness", func() {
 						},
 					},
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 		)
 
 		// Create ResourceGraphDefinition

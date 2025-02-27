@@ -68,12 +68,13 @@ func WithSchema(kind, version string, spec, status map[string]interface{}) Resou
 }
 
 // WithResource adds a resource to the ResourceGraphDefinition with the given name and definition
-// readyWhen and includeWhen expressions are optional.
+// readyWhen, includeWhen, and dependsOn expressions are optional.
 func WithResource(
 	id string,
 	template map[string]interface{},
 	readyWhen []string,
 	includeWhen []string,
+	dependsOn []string,
 ) ResourceGraphDefinitionOption {
 	return func(rgd *krov1alpha1.ResourceGraphDefinition) {
 		raw, err := json.Marshal(template)
@@ -84,6 +85,7 @@ func WithResource(
 			ID:          id,
 			ReadyWhen:   readyWhen,
 			IncludeWhen: includeWhen,
+			DependsOn:   dependsOn,
 			Template: runtime.RawExtension{
 				Object: &unstructured.Unstructured{Object: template},
 				Raw:    raw,

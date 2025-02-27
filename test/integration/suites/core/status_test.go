@@ -61,7 +61,7 @@ var _ = Describe("Status", func() {
 				"metadata": map[string]interface{}{
 					"name": "${schema.spec.field1}",
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 		)
 
 		Expect(env.Client.Create(ctx, rgd)).To(Succeed())

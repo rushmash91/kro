@@ -90,7 +90,7 @@ var _ = Describe("Update", func() {
 						},
 					},
 				},
-			}, nil, nil),
+			}, nil, nil, nil),
 		)
 
 		Expect(env.Client.Create(ctx, rgd)).To(Succeed())

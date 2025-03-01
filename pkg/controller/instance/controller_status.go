@@ -15,6 +15,7 @@ package instance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -23,6 +24,7 @@ import (
 
 	"github.com/kro-run/kro/api/v1alpha1"
 	"github.com/kro-run/kro/pkg/requeue"
+	"github.com/kro-run/kro/pkg/runtime"
 )
 
 func createCondition(conditionType v1alpha1.ConditionType, status corev1.ConditionStatus, reason, message string, generation int64) map[string]interface{} {
@@ -73,15 +75,7 @@ func (igr *instanceGraphReconciler) prepareConditions(
 	var conditions []interface{}
 
 	// Add primary reconciliation condition
-	if reconcileErr != nil {
-		conditions = append(conditions, createCondition(
-			"InstanceSynced",
-			corev1.ConditionFalse,
-			"ReconciliationFailed",
-			reconcileErr.Error(),
-			generation,
-		))
-	} else {
+	if reconcileErr == nil {
 		conditions = append(conditions, createCondition(
 			"InstanceSynced",
 			corev1.ConditionTrue,
@@ -89,7 +83,30 @@ func (igr *instanceGraphReconciler) prepareConditions(
 			"Instance reconciled successfully",
 			generation,
 		))
+		return conditions
 	}
+
+	// Check if it's an incomplete data error
+	var evalErr *runtime.EvalError
+	if errors.As(reconcileErr, &evalErr) && evalErr.IsIncompleteData {
+		conditions = append(conditions, createCondition(
+			"InstanceSynced",
+			corev1.ConditionFalse,
+			"WaitingForResources",
+			"Waiting for resources to be ready: "+evalErr.Err.Error(),
+			generation,
+		))
+		return conditions
+	}
+
+	// Handle other errors
+	conditions = append(conditions, createCondition(
+		"InstanceSynced",
+		corev1.ConditionFalse,
+		"ReconciliationFailed",
+		reconcileErr.Error(),
+		generation,
+	))
 
 	return conditions
 }

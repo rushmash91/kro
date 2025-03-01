@@ -15,6 +15,7 @@ package instance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -91,6 +92,19 @@ func (igr *instanceGraphReconciler) handleReconciliation(ctx context.Context, re
 	}()
 
 	igr.state.ReconcileErr = reconcileFunc(ctx)
+
+	// Check if the error is an incomplete data error
+	if igr.state.ReconcileErr != nil {
+		var evalErr *runtime.EvalError
+		if errors.As(igr.state.ReconcileErr, &evalErr) && evalErr.IsIncompleteData {
+			// This is an expected error during initial resource creation
+			// Set state to IN_PROGRESS and requeue
+			igr.state.State = InstanceStateInProgress
+			igr.log.V(1).Info("Waiting for resources to be ready", "error", evalErr.Err)
+			return igr.delayedRequeue(fmt.Errorf("waiting for resources to be ready: %w", evalErr.Err))
+		}
+	}
+
 	return igr.state.ReconcileErr
 }
 

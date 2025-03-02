@@ -68,7 +68,7 @@ func parseResource(resource interface{}, schema *spec.Schema, path string) ([]va
 }
 
 func getExpectedTypes(schema *spec.Schema) ([]string, error) {
-	// Handle "x-kubernetes-preserve-unknown-fields" extension first
+	// Handle extensions first
 	if hasStructuralSchemaMarkerEnabled(schema, xKubernetesPreserveUnknownFields) {
 		return []string{schemaTypeAny}, nil
 	}
@@ -80,21 +80,7 @@ func getExpectedTypes(schema *spec.Schema) ([]string, error) {
 
 	// Handle OneOf schemas
 	if len(schema.OneOf) > 0 {
-		var types []string
-
-		for _, subSchema := range schema.OneOf {
-			// If there are structural constraints, inject object
-			if len(subSchema.Required) > 0 || subSchema.Not != nil {
-				if !slices.Contains(types, "object") {
-					types = append(types, "object")
-				}
-			}
-			// Collect types if present
-			if len(subSchema.Type) > 0 {
-				types = append(types, subSchema.Type...)
-			}
-		}
-		// If we found any types, return them
+		types := collectTypesFromSubSchemas(schema.OneOf)
 		if len(types) > 0 {
 			return types, nil
 		}
@@ -102,11 +88,10 @@ func getExpectedTypes(schema *spec.Schema) ([]string, error) {
 
 	// Handle AnyOf schemas
 	if len(schema.AnyOf) > 0 {
-		var types []string
-		for _, subType := range schema.AnyOf {
-			types = append(types, subType.Type...)
+		types := collectTypesFromSubSchemas(schema.AnyOf)
+		if len(types) > 0 {
+			return types, nil
 		}
-		return types, nil
 	}
 
 	if len(schema.Type) > 0 && schema.Type[0] != "" {
@@ -120,7 +105,33 @@ func getExpectedTypes(schema *spec.Schema) ([]string, error) {
 		// the ExpectedSchema field.
 		return []string{schemaTypeAny}, nil
 	}
+
 	return nil, fmt.Errorf("unknown schema type")
+}
+
+// collectTypesFromSubSchemas extracts types from a slice of schemas,
+// handling structural constraints like Required and Not.
+func collectTypesFromSubSchemas(subSchemas []spec.Schema) []string {
+	var types []string
+
+	for _, subSchema := range subSchemas {
+		// If there are structural constraints, inject object type
+		if len(subSchema.Required) > 0 || subSchema.Not != nil {
+			if !slices.Contains(types, "object") {
+				types = append(types, "object")
+			}
+		}
+		// Collect types if present
+		if len(subSchema.Type) > 0 {
+			for _, t := range subSchema.Type {
+				if t != "" && !slices.Contains(types, t) {
+					types = append(types, t)
+				}
+			}
+		}
+	}
+
+	return types
 }
 
 func validateSchema(schema *spec.Schema, path string) error {

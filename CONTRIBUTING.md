@@ -3,8 +3,26 @@
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional
 documentation, we greatly value feedback and contributions from our community.
 
-Please read through this document before submitting any issues or pull requests to ensure we have all the necessary
-information to effectively respond to your bug report or contribution.
+Please read through this document before submitting any issues or pull requests to ensure we have all the necessary information to effectively respond to your bug report or contribution.
+
+## Getting Started
+
+If you're looking to join this wonderful wave of collaboration, here's how to begin:
+
+1. Take a look at the open issues to see what needs attention.
+
+2. **Important: Comment Before You Start Working**
+   - comment on an issue before you start working on it
+   - Wait for a maintainer to officially assign the issue to you
+   - This prevents duplicate work and ensures you have the latest context
+
+3. **If an Issue is Already Assigned**
+   - If you see an issue you're interested in but it's assigned to someone else
+   - Check the last activity date
+   - If there haven't been recent updates, you can politely comment asking both the assignee and maintainers about the status
+   - Example: "Hi! I notice this issue hasn't had recent activity. @assignee, are you still working on this? If not, would it be okay if I took it over?"
+
+4. Once assigned, you'll receive the green light to begin your contribution
 
 ## Reporting Bugs/Feature Requests
 
@@ -18,8 +36,8 @@ reported the issue. Please try to include as much information as you can. Detail
 * Any modifications you've made relevant to the bug
 * Anything unusual about your environment or deployment
 
-
 ## Contributing via Pull Requests
+
 Contributions via pull requests are much appreciated. Before sending us a pull request, please ensure that:
 
 1. You are working against the latest source on the *main* branch.
@@ -38,23 +56,21 @@ To send us a pull request, please:
 GitHub provides additional document on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
-## Development setup
+## Development Setup
 
-Setup the [local enviroment](docs/developer-getting-started.md) to build and test the code locally.
+Setup the [local environment](docs/developer-getting-started.md) to build and test the code locally.
 
-## Finding contributions to work on
+## Finding Contributions to Work On
+
 Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.
-
 
 ## Code of Conduct
 
 This project has adopted the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md).
 
-
-## Security 
+## Security
 
 TODO
-
 
 ## Licensing
 

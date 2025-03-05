@@ -92,6 +92,14 @@ Please join our community meeting.
 [zoom]: https://us06web.zoom.us/j/85388697226?pwd=9Xxz1F0FcNUq8zFGrsRqkHMhFZTpuj.1
 [youtube]: https://www.youtube.com/channel/UCUlcI3NYq9ehl5wsdfbJzSA
 
+
+<p align="center">
+  <i>If you like kro, please <a href="../../stargazers">★</a> star this repository to show your support! 🤩</i>
+ <br />
+<a href="../../stargazers">
+ <img align="center" src="https://api.star-history.com/svg?repos=kro-run/kro&type=Date" />
+</a></p>
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
